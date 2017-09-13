@@ -30,8 +30,13 @@ def run(rule, defined_variables, defined_actions):
                 continue
             params = action.get('params') or {}
             for key, param in params.items():
+                if not isinstance(param, str):
+                    continue
                 match = re.fullmatch(VARIABLE_SUBSTITUTION_REGEX, param)
-                params[key] = _get_variable_value(defined_variables, match.group(1)).value
+                if match:
+                    params[key] = _get_variable_value(defined_variables, match.group(1)).value
+                else:
+                    continue
         do_actions(actions, defined_actions)
         return True
     return False

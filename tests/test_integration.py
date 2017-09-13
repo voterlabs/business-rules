@@ -60,6 +60,12 @@ class IntegrationTests(TestCase):
                  "actions": [{"name": "some_action", "params": {"foo": "${net}"}}]},
                 SomeVariables(), actions)
 
+    def test_run_rules_without_variables(self):
+        actions = SomeActions()
+        run({"conditions": {"name": "ten", "operator": "equal_to", "value": 10},
+             "actions": [{"name": "some_action", "params": {"foo": 5}}]},
+            SomeVariables(), actions)
+        self.assertEquals(actions.result, 5)
 
     def test_true_boolean_variable(self):
         condition = {
