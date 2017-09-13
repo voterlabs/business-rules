@@ -1,3 +1,5 @@
+import re
+
 from .fields import FIELD_NO_INPUT
 
 
@@ -16,10 +18,20 @@ def run_all(rule_list,
     return rule_was_triggered
 
 
+VARIABLE_SUBSTITUTION_REGEX = re.compile('\$\{(.*)\}')
+
+
 def run(rule, defined_variables, defined_actions):
     conditions, actions = rule['conditions'], rule['actions']
     rule_triggered = check_conditions_recursively(conditions, defined_variables)
     if rule_triggered:
+        for action in actions:
+            if not isinstance(action, dict):
+                continue
+            params = action.get('params') or {}
+            for key, param in params.items():
+                match = re.fullmatch(VARIABLE_SUBSTITUTION_REGEX, param)
+                params[key] = _get_variable_value(defined_variables, match.group(1)).value
         do_actions(actions, defined_actions)
         return True
     return False

@@ -1,4 +1,4 @@
-from business_rules.engine import check_condition
+from business_rules.engine import check_condition, run_all, run
 from business_rules import export_rule_data
 from business_rules.actions import rule_action, BaseActions
 from business_rules.variables import BaseVariables, string_rule_variable, numeric_rule_variable, boolean_rule_variable
@@ -22,8 +22,13 @@ class SomeVariables(BaseVariables):
 
 class SomeActions(BaseActions):
 
+    def __init__(self):
+        super(SomeActions, self).__init__()
+        self.result = 0
+
     @rule_action(params={"foo": FIELD_NUMERIC})
-    def some_action(self, foo): pass
+    def some_action(self, foo):
+        self.result = foo
 
     @rule_action(label="woohoo", params={"bar": FIELD_TEXT})
     def some_other_action(self, bar): pass
@@ -41,6 +46,21 @@ class SomeActions(BaseActions):
 class IntegrationTests(TestCase):
     """ Integration test, using the library like a user would.
     """
+    def test_run_rules_with_variables(self):
+        actions = SomeActions()
+        run({"conditions": {"name": "ten", "operator": "equal_to", "value": 10},
+             "actions": [{"name": "some_action", "params": {"foo": "${ten}"}}]},
+            SomeVariables(), actions)
+        self.assertEquals(actions.result, 10)
+
+    def test_run_rules_with_undefined_variables(self):
+        actions = SomeActions()
+        with self.assertRaises(AssertionError):
+            run({"conditions": {"name": "ten", "operator": "equal_to", "value": 10},
+                 "actions": [{"name": "some_action", "params": {"foo": "${net}"}}]},
+                SomeVariables(), actions)
+
+
     def test_true_boolean_variable(self):
         condition = {
             'name': 'true_bool',
