@@ -37,7 +37,10 @@ def run(rule, defined_variables, defined_actions):
                     params[key] = _get_variable_value(defined_variables, match.group(1)).value
                 else:
                     continue
-        do_actions(actions, defined_actions)
+        try:
+            do_actions(actions, defined_actions)
+        except AssertionError as e:
+            raise AssertionError('There was a problem with rule {}: {}'.format(rule, e))
         return True
     return False
 
