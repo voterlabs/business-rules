@@ -85,8 +85,8 @@ def check_condition(condition, defined_variables):
     object must have a variable defined for any variables in this condition.
     """
     name, op, value = condition['name'], condition['operator'], condition['value']
-    operator_type = _get_variable_value(defined_variables, name)
     try:
+        operator_type = _get_variable_value(defined_variables, name)
         return _do_operator_comparison(operator_type, op, value)
     except AssertionError as e:
         raise AssertionError('Error with operator comparison in condition {}: {}'.format(condition, str(e)))
