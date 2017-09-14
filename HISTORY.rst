@@ -1,6 +1,12 @@
 History
 -------
 
+1.0.3
++++++
+released 2017-9-14
+
+- Adding better reporting for type issues in rules
+
 1.0.2
 +++++
 released 2017-9-13

@@ -86,7 +86,10 @@ def check_condition(condition, defined_variables):
     """
     name, op, value = condition['name'], condition['operator'], condition['value']
     operator_type = _get_variable_value(defined_variables, name)
-    return _do_operator_comparison(operator_type, op, value)
+    try:
+        return _do_operator_comparison(operator_type, op, value)
+    except AssertionError as e:
+        raise AssertionError('Error with operator comparison in condition {}: {}'.format(condition, str(e)))
 
 def _get_variable_value(defined_variables, name):
     """ Call the function provided on the defined_variables object with the
